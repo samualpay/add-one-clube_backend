@@ -9,3 +9,21 @@ services:
       - "8080:8080"
     volumes:
       - ./volume:/opt/workdir/dist/public/images
+    depends_on: 
+      - mysql
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_USER: 'test'
+      MYSQL_PASSWORD: 'test'
+      MYSQL_DATABASE: 'add_one_club'
+    ports:
+      - '3306:3306'
+    volumes:
+      - "./data/mysql/db:/var/lib/mysql"
+      - "./data/mysql/conf:/etc/mysql/conf.d"
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    tty: true
