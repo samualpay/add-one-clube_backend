@@ -1,14 +1,11 @@
 version: "2"
 services:
   api:
-    build:
-      context: .
-      dockerfile: ./DockerFile
-    image: add-one-club-backend:local
+    image: samualpay/add_one_club-backend:latest
     restart: always
     env_file:
       - ./local.env
     ports:
-      - "5001:5001"
+      - "8080:8080"
     volumes:
       - ./volume:/opt/workdir/dist/public/images
