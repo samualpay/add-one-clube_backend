@@ -14,7 +14,7 @@ class Common {
     return data;
   }
   sleep(ms: number) {
-    return new Promise((reslove) => {
+    return new Promise<void>((reslove) => {
       setTimeout(() => {
         reslove();
       }, ms);
