@@ -3,10 +3,13 @@ import { BaseRepository } from "./BaseRepository";
 import { MachineDTO } from "../dto/MachineDTO";
 import HttpException from "../exception/HttpException";
 
-class MachineRepository extends BaseRepository {
-  private getRepository() {
-    return this.getConnection().getRepository(Machine);
+class MachineRepository extends BaseRepository<Machine> {
+  constructor() {
+    super(Machine);
   }
+  // private getRepository() {
+  //   return this.getConnection().getRepository(Machine);
+  // }
   public async findById(id: number): Promise<Machine | undefined> {
     return this.getRepository().findOne({ id });
   }

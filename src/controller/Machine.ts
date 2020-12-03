@@ -12,29 +12,29 @@ import machineRepository from "../repository/Machine";
 import { Machine } from "../entity/Machine";
 
 class MachineController extends BaseController {
-  public path = "/api";
+  public path = "/api/machines";
   initRoutes(): Rout[] {
     return [
       {
-        action: "/machines",
+        action: "/",
         method: "post",
         middleware: [auth],
         runner: this.createMachine,
       },
       {
-        action: "/machines",
+        action: "/",
         method: "get",
         middleware: [auth],
         runner: this.findAll,
       },
       {
-        action: "/machines/:id",
+        action: "/:id",
         method: "delete",
         middleware: [auth],
         runner: this.delete,
       },
       {
-        action: "/machines",
+        action: "/",
         method: "put",
         middleware: [auth],
         runner: this.update,

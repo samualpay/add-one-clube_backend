@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from "typeorm";
+import { Activity } from "./Activity";
 import { Machine } from "./Machine";
 @Entity("user")
 export class User {
@@ -25,6 +26,8 @@ export class User {
   password!: string;
   @OneToMany((type) => Machine, (machine) => machine.user)
   machines!: Machine[];
+  @OneToMany((type) => Activity, (activity) => activity.user)
+  activitys!: Activity[];
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
   @UpdateDateColumn({ type: "timestamp" })
