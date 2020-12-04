@@ -1,4 +1,5 @@
 // { id: '111', city: 'Zhejiang', dist: 'Zhejiang', address: '111', area: '百貨公司', machineType: '戶外大型廣告面板', storeAttribute: '都會型商圈' }]
+import { ActivityStatus } from "../enum/ActivityStatus";
 import {
   Column,
   CreateDateColumn,
@@ -49,11 +50,23 @@ export class Activity {
     type: "int",
   })
   price!: number;
-  @OneToMany((type) => Discount, (discount) => discount.activity)
+  @OneToMany((type) => Discount, (discount) => discount.activity, {
+    cascade: true,
+  })
   discounts!: Discount[];
+  @Column({
+    type: "int",
+    nullable: true,
+  })
+  finalPrice!: number;
+  @Column({
+    type: "enum",
+    enum: ActivityStatus,
+    default: ActivityStatus.NOT_STARTED,
+  })
+  status!: ActivityStatus;
   @ManyToOne((type) => User, (user) => user.machines, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+    onDelete: "CASCADE",
   })
   @JoinColumn({ name: "userId" })
   user!: User;

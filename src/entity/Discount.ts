@@ -23,14 +23,13 @@ export class Discount {
   @Column({
     type: "int",
   })
-  peapleCount!: number;
+  peopleCount!: number;
   @Column({
     type: "int",
   })
   percent!: number;
   @ManyToOne((type) => Activity, (activity) => activity.discounts, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+    onDelete: "CASCADE",
   })
   @JoinColumn({ name: "activityId" })
   activity!: Activity;

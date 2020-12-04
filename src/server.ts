@@ -6,6 +6,7 @@ import UploadController from "./controller/UploadController";
 import "reflect-metadata";
 import AuthController from "./controller/Auth";
 import MachineController from "./controller/Machine";
+import ActivityController from "./controller/Activty";
 const port = process.env.PORT || "5000";
 const app = new App({
   port: parseInt(port),
@@ -14,6 +15,7 @@ const app = new App({
     new UploadController(),
     new AuthController(),
     new MachineController(),
+    new ActivityController(),
   ],
   middleWares: [bodyParser.json(), bodyParser.urlencoded({ extended: true })],
 });

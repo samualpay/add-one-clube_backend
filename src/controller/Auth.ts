@@ -50,7 +50,11 @@ class AuthController extends BaseController {
     if (user) {
       throw new HttpException(400, "帳號已存在");
     } else {
-      await userRepository.insert(body.username, body.password);
+      let entity = userRepository.create({
+        username: body.username,
+        password: body.password,
+      });
+      await userRepository.save(entity);
       result = { isSuccess: true, message: null };
     }
     res.json(result);
