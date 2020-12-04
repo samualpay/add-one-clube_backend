@@ -17,10 +17,10 @@ function auth(req: Request, res: Response, next: NextFunction) {
       req.userId = userId;
       next();
     } else {
-      throw new HttpException(401, "token not found");
+      throw new HttpException(401, "token 驗證失敗");
     }
   } catch (err) {
-    next(err);
+    next(new HttpException(401, "token 驗證失敗"));
   }
 }
 
