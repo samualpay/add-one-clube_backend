@@ -39,11 +39,11 @@ export class Activity {
   })
   description!: string;
   @Column({
-    type: "bigint",
+    type: "int",
   })
   start_at!: number;
   @Column({
-    type: "bigint",
+    type: "int",
   })
   end_at!: number;
   @Column({
