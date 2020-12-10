@@ -7,7 +7,15 @@ import { ActivityDto } from "../dto/ActivityDTO";
 import activityRepository from "../repository/Activity";
 import discountRepository from "../repository/Discount";
 import { Activity } from "../entity/Activity";
-
+function validTimes(activity: ActivityDto) {
+  let now = new Date().getTime() / 1000;
+  if (now <= activity.start_at) {
+    throw new HttpException(400, "開始時間錯誤");
+  }
+  if (activity.end_at < activity.start_at) {
+    throw new HttpException(400, "結束時間須晚於開始時間");
+  }
+}
 class ActivityController extends BaseController {
   public path = "/api/activitys";
   initRoutes(): Rout[] {
@@ -41,7 +49,8 @@ class ActivityController extends BaseController {
   private async create(req: Request, res: Response) {
     let userId = req.userId;
     let activity: ActivityDto = req.body;
-
+    debugger;
+    validTimes(activity);
     let entity = activityRepository.create({
       code: activity.code,
       imgUrl: activity.imgUrl,
@@ -80,6 +89,7 @@ class ActivityController extends BaseController {
   }
   private async update(req: Request, res: Response) {
     let activity: ActivityDto = req.body;
+    validTimes(activity);
     let entity = await activityRepository.findById(activity.id);
     if (entity) {
       entity.code = activity.code;
