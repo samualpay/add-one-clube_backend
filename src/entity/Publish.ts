@@ -48,6 +48,12 @@ export class Publish {
     nullable: false,
   })
   buyCount!: number;
+  @Column({
+    type: "bool",
+    default: false,
+    nullable: false,
+  })
+  publish!: boolean;
   // user
   @ManyToOne((type) => User, (user) => user.publishs, {
     onDelete: "CASCADE",
