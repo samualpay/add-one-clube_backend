@@ -10,7 +10,9 @@ import {
   RelationId,
   PrimaryGeneratedColumn,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
+import { Publish } from "./Publish";
 import { User } from "./User";
 @Entity("machine")
 export class Machine {
@@ -61,6 +63,10 @@ export class Machine {
     nullable: true,
   })
   userId!: number;
+  @OneToMany((type) => Publish, (publish) => publish.machine, {
+    cascade: true,
+  })
+  publishs!: Publish[];
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
   @UpdateDateColumn({ type: "timestamp" })

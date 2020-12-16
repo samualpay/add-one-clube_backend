@@ -14,6 +14,7 @@ import {
 } from "typeorm";
 import { Discount } from "./Discount";
 import { User } from "./User";
+import { Publish } from "./Publish";
 @Entity("activity")
 export class Activity {
   @PrimaryGeneratedColumn()
@@ -95,6 +96,11 @@ export class Activity {
     nullable: true,
   })
   userId!: number;
+
+  @OneToMany((type) => Publish, (publish) => publish.activity, {
+    cascade: true,
+  })
+  publishs!: Publish[];
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
   @UpdateDateColumn({ type: "timestamp" })
