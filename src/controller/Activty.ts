@@ -7,9 +7,10 @@ import { ActivityDto } from "../dto/ActivityDTO";
 import activityRepository from "../repository/Activity";
 import discountRepository from "../repository/Discount";
 import { Activity } from "../entity/Activity";
+import { ActivityStatus } from "enum/ActivityStatus";
 function validTimes(activity: ActivityDto) {
   let now = new Date().getTime() / 1000;
-  if (now <= activity.start_at) {
+  if (now > activity.start_at) {
     throw new HttpException(400, "開始時間錯誤");
   }
   if (activity.end_at < activity.start_at) {
@@ -33,6 +34,12 @@ class ActivityController extends BaseController {
         runner: this.findAll,
       },
       {
+        action: "/withoutStatus",
+        method: "get",
+        middleware: [auth],
+        runner: this.findAllWithoutStatus,
+      },
+      {
         action: "/:id",
         method: "delete",
         middleware: [auth],
@@ -49,7 +56,6 @@ class ActivityController extends BaseController {
   private async create(req: Request, res: Response) {
     let userId = req.userId;
     let activity: ActivityDto = req.body;
-    debugger;
     validTimes(activity);
     let entity = activityRepository.create({
       code: activity.code,
@@ -77,10 +83,25 @@ class ActivityController extends BaseController {
   }
   private async findAll(req: Request, res: Response) {
     let userId = req.userId;
+    let query: { status?: ActivityStatus } = req.query;
     let list: Activity[] = await activityRepository.findByUserIdWithDiscount(
-      userId
+      userId,
+      query
     );
     res.json({ list });
+  }
+  private async findAllWithoutStatus(req: Request, res: Response) {
+    let userId = req.userId;
+    let query: { status?: ActivityStatus } = req.query;
+    if (query.status) {
+      let list: Activity[] = await activityRepository.findByUserIdWithDiscountExcludeStatus(
+        userId,
+        query.status
+      );
+      res.json({ list });
+    } else {
+      throw new HttpException(400, "status is required");
+    }
   }
   private async delete(req: Request, res: Response) {
     let id: number = parseInt(req.params.id);

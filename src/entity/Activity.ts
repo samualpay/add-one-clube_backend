@@ -30,7 +30,7 @@ export class Activity {
   imgUrl!: string;
   @Column({
     length: 128,
-    nullable: false,
+    nullable: true,
   })
   videoUrl!: string;
   @Column({
@@ -65,6 +65,27 @@ export class Activity {
     default: ActivityStatus.NOT_STARTED,
   })
   status!: ActivityStatus;
+
+  @Column({
+    type: "int",
+    default: 0,
+    nullable: false,
+  })
+  linkCount!: number;
+
+  @Column({
+    type: "int",
+    default: 0,
+    nullable: false,
+  })
+  registeredCount!: number;
+
+  @Column({
+    type: "int",
+    default: 0,
+    nullable: false,
+  })
+  buyCount!: number;
   @ManyToOne((type) => User, (user) => user.machines, {
     onDelete: "CASCADE",
   })
