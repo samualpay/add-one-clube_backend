@@ -19,11 +19,13 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
+  Unique,
 } from "typeorm";
 import { User } from "./User";
 import { Machine } from "./Machine";
 import { Activity } from "./Activity";
 @Entity("publish")
+@Unique("machineId_activityId", ["machineId", "activityId"])
 export class Publish {
   @PrimaryGeneratedColumn()
   id!: number;
