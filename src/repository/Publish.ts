@@ -1,3 +1,4 @@
+import { FindManyOptions } from "typeorm";
 import { Publish } from "../entity/Publish";
 import { BaseRepository } from "./BaseRepository";
 

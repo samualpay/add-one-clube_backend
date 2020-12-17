@@ -1,6 +1,11 @@
 import HttpException from "../exception/HttpException";
 import database from "../config/database";
-import { DeepPartial, FindConditions, FindOneOptions } from "typeorm";
+import {
+  DeepPartial,
+  FindConditions,
+  FindManyOptions,
+  FindOneOptions,
+} from "typeorm";
 
 export type ObjectType<T> = { new (): T } | Function;
 export class BaseRepository<T, PK> {
@@ -18,10 +23,13 @@ export class BaseRepository<T, PK> {
   getRepository() {
     return this.getConnection().getRepository(this.type);
   }
+  find(query?: FindManyOptions<T>) {
+    return this.getRepository().find(query);
+  }
   findById(id: PK) {
     return this.getRepository().findOne({ where: { id } });
   }
-  findOne(options?: FindOneOptions) {
+  findOne(options?: FindOneOptions<T>) {
     return this.getRepository().findOne(options);
   }
   findByUserId(userId: number) {

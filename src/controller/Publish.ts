@@ -56,6 +56,12 @@ class PublishController extends BaseController {
         middleware: [auth],
         runner: this.publish,
       },
+      {
+        action: "/activity/:id",
+        method: "patch",
+        middleware: [auth],
+        runner: this.publishByActivityId,
+      },
     ];
   }
 
@@ -131,6 +137,24 @@ class PublishController extends BaseController {
     publishEntity = await publishRepository.save(publishEntity);
     let result = addUrlForPublish(publishEntity);
     res.json(result);
+  }
+  private async publishByActivityId(req: Request, res: Response) {
+    let userId = req.userId;
+    let activityId: number = parseInt(req.params.id);
+    let activity = await activityRepository.findById(activityId);
+    if (!activity || activity.userId !== userId) {
+      throw new HttpException(403, "Permission denied");
+    }
+    let publishEntitys = await publishRepository.find({
+      where: { activityId },
+    });
+    publishEntitys = publishEntitys.map((elem) => {
+      elem.publish = true;
+      return elem;
+    });
+    publishEntitys = await publishRepository.bulkSave(publishEntitys);
+    let list = addUrlForPublishs(publishEntitys);
+    res.json({ list });
   }
 }
 export default PublishController;
