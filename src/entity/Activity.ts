@@ -11,11 +11,13 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
+  Unique,
 } from "typeorm";
 import { Discount } from "./Discount";
 import { User } from "./User";
 import { Publish } from "./Publish";
 @Entity("activity")
+@Unique("userId_code", ["code", "userId"])
 export class Activity {
   @PrimaryGeneratedColumn()
   id!: number;

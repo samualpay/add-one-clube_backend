@@ -11,10 +11,12 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
+  Unique,
 } from "typeorm";
 import { Publish } from "./Publish";
 import { User } from "./User";
 @Entity("machine")
+@Unique("userId_code", ["code", "userId"])
 export class Machine {
   @PrimaryGeneratedColumn()
   id!: number;
