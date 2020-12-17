@@ -24,6 +24,7 @@ import {
 import { User } from "./User";
 import { Machine } from "./Machine";
 import { Activity } from "./Activity";
+import { Order } from "./Order";
 @Entity("publish")
 @Unique("machineId_activityId", ["machineId", "activityId"])
 export class Publish {
@@ -87,6 +88,10 @@ export class Publish {
     nullable: true,
   })
   activityId!: number;
+  @OneToMany((type) => Order, (order) => order.publish, {
+    cascade: true,
+  })
+  orders!: Order[];
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
   @UpdateDateColumn({ type: "timestamp" })
