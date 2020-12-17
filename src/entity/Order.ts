@@ -35,10 +35,12 @@ export class Order {
   preCount!: number;
   @Column({
     type: "int",
+    nullable: true,
   })
   buyCount!: number;
   @Column({
     type: "int",
+    nullable: true,
   })
   totalPrice!: number;
   @Column({

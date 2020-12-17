@@ -11,6 +11,12 @@ class PublishRepository extends BaseRepository<Publish, number> {
       where: query,
     });
   }
+  findByIdWithRelation(id: number) {
+    return this.getRepository().findOne({
+      relations: ["machine", "activity", "activity.discounts"],
+      where: { id },
+    });
+  }
   findByActivityIdAndMachineId(machineId: number, activityId: number) {
     return this.getRepository().findOne({
       where: { machineId, activityId },
