@@ -1,4 +1,5 @@
 node_modules/
 dist/
 data/
-src/public/images/
+src/public/images
+src/public/videos
