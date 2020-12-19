@@ -3,11 +3,12 @@ import { Rout } from "type/Rout";
 import BaseController from "./BaseController";
 import auth from "../middleware/auth";
 import machineRepository from "../repository/Machine";
-import activityRepository from "../repository/Activity";
-import publishRepository from "../repository/Publish";
+import activityRepository from "../repository/activityRepository";
+import publishRepository from "../repository/publishRepository";
 import { Publish } from "../entity/Publish";
 import HttpException from "../exception/HttpException";
 import { ActivityStatus } from "../enum/ActivityStatus";
+import publishService from "../service/publishService";
 const publishMobilePage =
   process.env.PUBLISH_MOBILE_PAGE || "http://localhost:3000/mobile/publish";
 type CreateProps = {
@@ -67,19 +68,13 @@ class PublishController extends BaseController {
 
   private async findByActivityId(req: Request, res: Response) {
     let activityId: number = parseInt(req.params.id);
-    let publishs: Publish[] = await publishRepository.findWithRelation({
-      activityId,
-    });
-    let list = addUrlForPublishs(publishs);
+    let list = await publishService.findByActivityIdWithRelation(activityId);
     res.json({ list });
   }
 
   private async findByMachineId(req: Request, res: Response) {
     let machineId: number = parseInt(req.params.id);
-    let publishs: Publish[] = await publishRepository.findWithRelation({
-      machineId,
-    });
-    let list = addUrlForPublishs(publishs);
+    let list = await publishService.findByMachineIdWithRelation(machineId);
     res.json({ list });
   }
   private async create(req: Request, res: Response) {

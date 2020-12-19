@@ -5,7 +5,7 @@ import auth from "../middleware/auth";
 import { OrderStatus } from "../enum/OrderStatus";
 import orderRepository from "../repository/Order";
 import customerRepository from "../repository/Customer";
-import publishRepository from "../repository/Publish";
+import publishRepository from "../repository/publishRepository";
 import { ActivityStatus } from "../enum/ActivityStatus";
 import HttpException from "../exception/HttpException";
 type CreateProps = {

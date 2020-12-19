@@ -7,10 +7,7 @@ class ActivityRepository extends BaseRepository<Activity, number> {
   constructor() {
     super(Activity);
   }
-  findByUserIdWithDiscount(
-    userId: number,
-    filter: { status?: ActivityStatus }
-  ) {
+  findByUserIdWithDiscount(userId: number, filter: any) {
     return this.getRepository().find({
       relations: ["discounts"],
       where: { userId, ...filter },
@@ -23,6 +20,18 @@ class ActivityRepository extends BaseRepository<Activity, number> {
     return this.getRepository().find({
       relations: ["discounts"],
       where: { userId, status: Not(status) },
+    });
+  }
+  findByIdWithDiscount(id: number) {
+    return this.getRepository().findOne({
+      relations: ["discounts"],
+      where: { id },
+    });
+  }
+  findAllExcludeStatus(status: ActivityStatus) {
+    return this.getRepository().find({
+      relations: ["discounts"],
+      where: { status: Not(status) },
     });
   }
 }
