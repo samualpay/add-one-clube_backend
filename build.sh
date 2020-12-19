@@ -1,4 +1,5 @@
 rm -rf ./dist
 tsc -p .
 cp -R ./src/views ./dist/views
-cp -R ./src/public ./dist/public
+mkdir ./dist/public
+cp -R ./src/public/hello.html ./dist/public/hello.html
