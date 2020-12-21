@@ -216,8 +216,8 @@ class ActivityService {
     let act = await this.getActivity({ activityId, activity });
     act.status = ActivityStatus.END;
     act = await this.updateFinalPrice({ activity: act, updateNow });
+    orderService.sendMailToCutomerByActivityId(act.id);
     return act;
-    //todo send mail to user
   }
 }
 export default new ActivityService();

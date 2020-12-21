@@ -5,6 +5,9 @@ import { ActivityStatus } from "../enum/ActivityStatus";
 import HttpException from "../exception/HttpException";
 import publishService from "./publishService";
 import { OrderStatus } from "../enum/OrderStatus";
+import sendEmailService from "./sendEmailService";
+const ORDER_MOBILE_PAGE =
+  process.env.ORDER_MOBILE_PAGE || "http://localhost:3000/mobile/order";
 type CreateProps = {
   email: string;
   publishId: number;
@@ -57,6 +60,16 @@ class OrderService {
 
     orders = await orderRepository.bulkSave(orders);
     return orders;
+  }
+  async sendMailToCutomerByActivityId(activityId: number) {
+    let orders = await orderRepository.findByActivityId(activityId);
+    orders.forEach((order) => {
+      sendEmailService.sendBuyLink(
+        order.publish.activity.code,
+        `${ORDER_MOBILE_PAGE}/${order.id}`,
+        order.customer.email
+      );
+    });
   }
 }
 export default new OrderService();

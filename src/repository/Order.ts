@@ -11,6 +11,7 @@ class OrderRepository extends BaseRepository<Order, number> {
     let query = this.getRepository()
       .createQueryBuilder("order")
       .innerJoinAndSelect("order.publish", "publish")
+      .innerJoinAndSelect("order.customer", "customer")
       .innerJoinAndSelect("publish.activity", "activity")
       .where("publish.activityId = :activityId", { activityId });
     return query.getMany();
