@@ -3,11 +3,7 @@ import { Rout } from "type/Rout";
 import BaseController from "./BaseController";
 import auth from "../middleware/auth";
 import { OrderStatus } from "../enum/OrderStatus";
-import orderRepository from "../repository/Order";
-import customerRepository from "../repository/Customer";
-import publishRepository from "../repository/publishRepository";
-import { ActivityStatus } from "../enum/ActivityStatus";
-import HttpException from "../exception/HttpException";
+import orderService from "../service/orderService";
 type CreateProps = {
   email: string;
   publishId: number;
@@ -58,23 +54,19 @@ class OrderController extends BaseController {
   private async find(req: Request, res: Response) {
     let userId = req.userId;
     let {
-      activityId: activityStr,
+      activityId: activityIdStr,
       machineId: machineIdStr,
       status,
     }: QueryProps = req.query;
-    let publish: { userId: number; activityId?: number; machineId?: number } = {
-      userId,
-    };
     let activityId: number | undefined;
     let machineId: number | undefined;
-    if (activityStr) {
-      activityId = parseInt(activityStr);
+    if (activityIdStr) {
+      activityId = parseInt(activityIdStr);
     }
     if (machineIdStr) {
       machineId = parseInt(machineIdStr);
     }
-    let list = await orderRepository.query({
-      userId,
+    let list = await orderService.find(userId, {
       activityId,
       machineId,
       status,
@@ -83,21 +75,7 @@ class OrderController extends BaseController {
   }
   private async create(req: Request, res: Response) {
     let { email, preCount, publishId }: CreateProps = req.body;
-    let customer = await customerRepository.findOne({ where: { email } });
-    if (!customer) {
-      customer = customerRepository.create({ email });
-      customer = await customerRepository.save(customer);
-    }
-    let publish = await publishRepository.findByIdWithRelation(publishId);
-    if (!publish || publish.activity.status !== ActivityStatus.START) {
-      throw new HttpException(400, "活動不存在");
-    }
-    let order = orderRepository.create({
-      preCount,
-      publish,
-      customerId: customer.id,
-    });
-    order = await orderRepository.save(order);
+    let order = await orderService.create({ email, publishId, preCount });
     res.json(order);
   }
 }
