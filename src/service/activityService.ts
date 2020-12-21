@@ -5,6 +5,7 @@ import { ActivityDto, DiscountDto } from "../dto/ActivityDTO";
 import HttpException from "../exception/HttpException";
 import discountRepository from "../repository/discountRepository";
 import publishService from "./publishService";
+import orderService from "./orderService";
 const discountError = new HttpException(400, "階層設定異常");
 type activityProps = {
   activityId?: number;
@@ -201,6 +202,7 @@ class ActivityService {
       }
     });
     act.finalPrice = finalPrice;
+    await orderService.updateOrderPriceByActivityId(act.id, finalPrice);
     if (updateNow) {
       act = await activityRepository.save(act);
     }

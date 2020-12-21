@@ -7,6 +7,14 @@ class OrderRepository extends BaseRepository<Order, number> {
   constructor() {
     super(Order);
   }
+  findByActivityId(activityId: number) {
+    let query = this.getRepository()
+      .createQueryBuilder("order")
+      .innerJoinAndSelect("order.publish", "publish")
+      .innerJoinAndSelect("publish.activity", "activity")
+      .where("publish.activityId = :activityId", { activityId });
+    return query.getMany();
+  }
   query({
     userId,
     activityId,
