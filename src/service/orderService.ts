@@ -49,20 +49,6 @@ class OrderService {
     await publishService.updateCount({ publishId });
     return order;
   }
-  async updateOrderPriceByActivityId(activityId: number, finalPrice?: number) {
-    let orders = await orderRepository.findByActivityId(activityId);
-    orders = orders.map((order) => {
-      if (finalPrice) {
-        order.totalPrice = order.buyCount * finalPrice;
-      } else {
-        order.totalPrice = order.buyCount * order.publish.activity.finalPrice;
-      }
-      return order;
-    });
-
-    orders = await orderRepository.bulkSave(orders);
-    return orders;
-  }
   async sendMailToCutomerByActivityId(activityId: number) {
     let orders = await orderRepository.findByActivityId(activityId);
     orders.forEach((order) => {
@@ -104,6 +90,7 @@ class OrderService {
     customer.phone = phone;
     customer.address = address;
     order.buyCount = buyCount;
+    order.totalPrice = buyCount * order.publish.activity.finalPrice;
     //todo need change when payment implement
     order.status = OrderStatus.PAID;
     order.customer = customer;

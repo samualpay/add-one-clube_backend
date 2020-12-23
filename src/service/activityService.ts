@@ -202,7 +202,6 @@ class ActivityService {
       }
     });
     act.finalPrice = finalPrice;
-    await orderService.updateOrderPriceByActivityId(act.id, finalPrice);
     if (updateNow) {
       act = await activityRepository.save(act);
     }
