@@ -6,6 +6,8 @@ import HttpException from "../exception/HttpException";
 import publishService from "./publishService";
 import { OrderStatus } from "../enum/OrderStatus";
 import sendEmailService from "./sendEmailService";
+import { Order } from "../entity/Order";
+import Customer from "../repository/Customer";
 const ORDER_MOBILE_PAGE =
   process.env.ORDER_MOBILE_PAGE || "http://localhost:3000/mobile/order";
 type CreateProps = {
@@ -70,6 +72,43 @@ class OrderService {
         order.customer.email
       );
     });
+  }
+  private checkOrderCanBuy(order?: Order): Order {
+    if (
+      !order ||
+      order.status !== OrderStatus.PREORDER ||
+      order.publish.activity.status !== ActivityStatus.END
+    ) {
+      throw new HttpException(400, "訂單異常");
+    } else {
+      return order;
+    }
+  }
+  async findByIdForMobile(id: number) {
+    let order = await orderRepository.findByIdWithRelation(id);
+    this.checkOrderCanBuy(order);
+    return order;
+  }
+  async buyForMobile(
+    id: number,
+    name: string,
+    phone: string,
+    address: string,
+    buyCount: number
+  ) {
+    let order = this.checkOrderCanBuy(
+      await orderRepository.findByIdWithRelation(id)
+    );
+    let customer = order.customer;
+    customer.name = name;
+    customer.phone = phone;
+    customer.address = address;
+    order.buyCount = buyCount;
+    //todo need change when payment implement
+    order.status = OrderStatus.PAID;
+    order.customer = customer;
+    await orderRepository.save(order);
+    await customerRepository.save(customer);
   }
 }
 export default new OrderService();

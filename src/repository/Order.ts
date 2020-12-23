@@ -7,6 +7,13 @@ class OrderRepository extends BaseRepository<Order, number> {
   constructor() {
     super(Order);
   }
+  async findByIdWithRelation(id: number) {
+    let result = await this.getRepository().findOne({
+      relations: ["publish", "publish.activity", "customer"],
+      where: { id },
+    });
+    return result;
+  }
   findByActivityId(activityId: number) {
     let query = this.getRepository()
       .createQueryBuilder("order")

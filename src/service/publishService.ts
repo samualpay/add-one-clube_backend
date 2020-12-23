@@ -3,6 +3,8 @@ import HttpException from "../exception/HttpException";
 import { Publish } from "../entity/Publish";
 import publishRepository from "../repository/publishRepository";
 import activityService from "./activityService";
+import { getRepository } from "typeorm";
+import { ActivityStatus } from "../enum/ActivityStatus";
 const publishMobilePage =
   process.env.PUBLISH_MOBILE_PAGE || "http://localhost:3000/mobile/publish";
 type PublishProps = {
@@ -72,6 +74,14 @@ class PublishService {
     pub.buyCount = buyCount;
     pub = await publishRepository.save(pub);
     await activityService.updateActivityCounts(pub.activityId);
+    return pub;
+  }
+  async findByIdForMobile(id: number) {
+    let pub = await publishRepository.findByIdWithRelation(id);
+    if (!pub || pub.activity.status !== ActivityStatus.START) {
+      throw new HttpException(404, "活動不存在");
+    }
+    this.addLinkCountForPubilish({ publishId: id });
     return pub;
   }
 }

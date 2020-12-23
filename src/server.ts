@@ -9,6 +9,8 @@ import MachineController from "./controller/Machine";
 import ActivityController from "./controller/Activty";
 import PublishController from "./controller/Publish";
 import OrderController from "./controller/Order";
+import OrderMobileController from "./controller/mobile/OrderMobileController";
+import PublishMobileController from "./controller/mobile/PublishMobileController";
 import * as tasks from "./cronjob";
 const port = process.env.PORT || "5000";
 const app = new App({
@@ -21,6 +23,8 @@ const app = new App({
     new ActivityController(),
     new PublishController(),
     new OrderController(),
+    new OrderMobileController(),
+    new PublishMobileController(),
   ],
   middleWares: [bodyParser.json(), bodyParser.urlencoded({ extended: true })],
 });
