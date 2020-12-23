@@ -40,6 +40,12 @@ class ActivityController extends BaseController {
         middleware: [auth],
         runner: this.update,
       },
+      {
+        action: "/end",
+        method: "patch",
+        middleware: [auth],
+        runner: this.end,
+      },
     ];
   }
   private async create(req: Request, res: Response) {
@@ -73,6 +79,15 @@ class ActivityController extends BaseController {
     let activity: ActivityDto = req.body;
     let result = await activityService.update(userId, activity);
     res.json(result);
+  }
+  private async end(req: Request, res: Response) {
+    let userId = req.userId;
+    let body: { id: number } = req.body;
+    await activityService.updateActivityStatusToEnd({
+      activityId: body.id,
+      updateNow: true,
+    });
+    res.json({});
   }
 }
 export default ActivityController;
