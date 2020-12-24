@@ -14,6 +14,13 @@ type QueryProps = {
   machineId?: string;
   status?: OrderStatus;
 };
+type BuyProps = {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  buyCount: number;
+};
 class OrderController extends BaseController {
   public path = "/api/orders";
   initRoutes(): Rout[] {
@@ -30,18 +37,12 @@ class OrderController extends BaseController {
         middleware: [],
         runner: this.create,
       },
-      // {
-      //   action: "/:id",
-      //   method: "delete",
-      //   middleware: [auth],
-      //   runner: this.delete,
-      // },
-      // {
-      //   action: "/:id",
-      //   method: "patch",
-      //   middleware: [auth],
-      //   runner: this.publish,
-      // },
+      {
+        action: "/buy",
+        method: "patch",
+        middleware: [],
+        runner: this.buyForMobile,
+      },
       // {
       //   action: "/activity/:id",
       //   method: "patch",
@@ -76,6 +77,17 @@ class OrderController extends BaseController {
   private async create(req: Request, res: Response) {
     let { email, preCount, publishId }: CreateProps = req.body;
     let order = await orderService.create({ email, publishId, preCount });
+    res.json(order);
+  }
+  private async buyForMobile(req: Request, res: Response) {
+    let { id, name, address, phone, buyCount }: BuyProps = req.body;
+    let order = await orderService.buyForMobile(
+      id,
+      name,
+      phone,
+      address,
+      buyCount
+    );
     res.json(order);
   }
 }
