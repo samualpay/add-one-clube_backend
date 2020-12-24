@@ -14,7 +14,10 @@ type PublishProps = {
 };
 class PublishService {
   private addUrlForPublish(publish: Publish) {
-    let url = `${publishMobilePage}/${publish.id}`;
+    let url = "";
+    if (publish.publish && publish.activity.status === ActivityStatus.START) {
+      url = `${publishMobilePage}/${publish.id}`;
+    }
     return { url, ...publish };
   }
   private addUrlForPublishs(publishs: Publish[]) {
@@ -78,7 +81,11 @@ class PublishService {
   }
   async findByIdForMobile(id: number) {
     let pub = await publishRepository.findByIdWithRelation(id);
-    if (!pub || pub.activity.status !== ActivityStatus.START) {
+    if (
+      !pub ||
+      pub.activity.status !== ActivityStatus.START ||
+      pub.publish != true
+    ) {
       throw new HttpException(404, "活動不存在");
     }
     this.addLinkCountForPubilish({ publishId: id });
