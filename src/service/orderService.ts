@@ -72,7 +72,7 @@ class OrderService {
   }
   async findByIdForMobile(id: number) {
     let order = await orderRepository.findByIdWithRelation(id);
-    this.checkOrderCanBuy(order);
+    // this.checkOrderCanBuy(order);
     return order;
   }
   async buyForMobile(
