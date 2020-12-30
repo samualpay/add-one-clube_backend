@@ -37,8 +37,8 @@ class ActivityService {
       if (i > 0) {
         let bef = discounts[i - 1];
         if (
-          discount.peopleCount < bef.peopleCount ||
-          discount.percent > bef.percent
+          discount.peopleCount <= bef.peopleCount ||
+          discount.percent >= bef.percent
         ) {
           throw discountError;
         }
