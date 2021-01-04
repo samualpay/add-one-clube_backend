@@ -1,3 +1,6 @@
+export type ActivityImageDto = {
+  fileName: string;
+};
 export type DiscountDto = {
   peopleCount: number;
   percent: number;
@@ -5,8 +8,8 @@ export type DiscountDto = {
 export type ActivityDto = {
   id: number;
   code: string;
-  imgUrl: string;
-  videoUrl: string;
+  images: ActivityImageDto[];
+  videos: ActivityImageDto[];
   description: string;
   start_at: number;
   end_at: number;

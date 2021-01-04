@@ -9,7 +9,7 @@ class ActivityRepository extends BaseRepository<Activity, number> {
   }
   findByUserIdWithDiscount(userId: number, filter: any) {
     return this.getRepository().find({
-      relations: ["discounts"],
+      relations: ["discounts", "images", "videos"],
       where: { userId, ...filter },
     });
   }
@@ -18,19 +18,19 @@ class ActivityRepository extends BaseRepository<Activity, number> {
     status: ActivityStatus
   ) {
     return this.getRepository().find({
-      relations: ["discounts"],
+      relations: ["discounts", "images", "videos"],
       where: { userId, status: Not(status) },
     });
   }
   findByIdWithDiscount(id: number) {
     return this.getRepository().findOne({
-      relations: ["discounts"],
+      relations: ["discounts", "images", "videos"],
       where: { id },
     });
   }
   findAllExcludeStatus(status: ActivityStatus) {
     return this.getRepository().find({
-      relations: ["discounts"],
+      relations: ["discounts", "images", "videos"],
       where: { status: Not(status) },
     });
   }

@@ -5,9 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   UpdateDateColumn,
-  PrimaryColumn,
   ManyToOne,
-  RelationId,
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
@@ -16,6 +14,8 @@ import {
 import { Discount } from "./Discount";
 import { User } from "./User";
 import { Publish } from "./Publish";
+import { ActivityImage } from "./ActivityImage";
+import { ActivityVideo } from "./ActivityVideo";
 @Entity("activity")
 @Unique("userId_code", ["code", "userId"])
 export class Activity {
@@ -26,16 +26,6 @@ export class Activity {
     nullable: false,
   })
   code!: string;
-  @Column({
-    length: 128,
-    nullable: false,
-  })
-  imgUrl!: string;
-  @Column({
-    length: 128,
-    nullable: true,
-  })
-  videoUrl!: string;
   @Column({
     length: 128,
     nullable: false,
@@ -53,6 +43,22 @@ export class Activity {
     type: "int",
   })
   price!: number;
+  @OneToMany(
+    (type) => ActivityImage,
+    (activityImage) => activityImage.activity,
+    {
+      cascade: true,
+    }
+  )
+  images!: ActivityImage[];
+  @OneToMany(
+    (type) => ActivityVideo,
+    (activityVideo) => activityVideo.activity,
+    {
+      cascade: true,
+    }
+  )
+  videos!: ActivityVideo[];
   @OneToMany((type) => Discount, (discount) => discount.activity, {
     cascade: true,
   })

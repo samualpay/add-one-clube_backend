@@ -6,6 +6,8 @@ import HttpException from "../exception/HttpException";
 import discountRepository from "../repository/discountRepository";
 import publishService from "./publishService";
 import orderService from "./orderService";
+import activityImageRepository from "../repository/activityImageRepository";
+import activityVideoRepository from "../repository/activityVideoRepository";
 const discountError = new HttpException(400, "階層設定異常");
 type activityProps = {
   activityId?: number;
@@ -13,6 +15,12 @@ type activityProps = {
   updateNow?: boolean;
 };
 class ActivityService {
+  private validImages(activity: ActivityDto) {
+    let images = activity.images;
+    if (images.length < 1) {
+      throw new HttpException(400, "至少要有一張產品圖");
+    }
+  }
   private validTimes(activity: ActivityDto) {
     let now = new Date().getTime() / 1000;
     if (now > activity.start_at) {
@@ -46,6 +54,7 @@ class ActivityService {
     }
   }
   private validActivity(activity: ActivityDto) {
+    this.validImages(activity);
     this.validTimes(activity);
     this.validDicounts(activity.discounts);
   }
@@ -53,13 +62,19 @@ class ActivityService {
     this.validActivity(activity);
     let entity = activityRepository.create({
       code: activity.code,
-      imgUrl: activity.imgUrl,
-      videoUrl: activity.videoUrl,
       description: activity.description,
       start_at: activity.start_at,
       end_at: activity.end_at,
       price: activity.price,
       userId: userId,
+    });
+    let images = activity.images.map((elem) => {
+      let item = activityImageRepository.create({ fileName: elem.fileName });
+      return item;
+    });
+    let videos = activity.videos.map((elem) => {
+      let item = activityVideoRepository.create({ fileName: elem.fileName });
+      return item;
     });
     let discountEntitys = activity.discounts.map((elem, index) => {
       let level = index + 1;
@@ -71,6 +86,8 @@ class ActivityService {
       return item;
     });
     entity.discounts = discountEntitys;
+    entity.images = images;
+    entity.videos = videos;
     let result = await activityRepository.save(entity);
     return result;
   }
@@ -87,12 +104,18 @@ class ActivityService {
       throw new HttpException(400, "activity can't modify when status is end");
     }
     entity.code = activity.code;
-    entity.imgUrl = activity.imgUrl;
-    entity.videoUrl = activity.videoUrl;
     entity.description = activity.description;
     entity.start_at = activity.start_at;
     entity.end_at = activity.end_at;
     entity.price = activity.price;
+    let images = activity.images.map((elem) => {
+      let item = activityImageRepository.create({ fileName: elem.fileName });
+      return item;
+    });
+    let videos = activity.videos.map((elem) => {
+      let item = activityVideoRepository.create({ fileName: elem.fileName });
+      return item;
+    });
     let discountEntitys = activity.discounts.map((elem, index) => {
       let level = index + 1;
       return discountRepository.create({
@@ -102,6 +125,8 @@ class ActivityService {
       });
     });
     entity.discounts = discountEntitys;
+    entity.images = images;
+    entity.videos = videos;
     let result = await activityRepository.save(entity);
     return result;
   }
