@@ -5,7 +5,7 @@ import auth from "../middleware/auth";
 import { OrderStatus } from "../enum/OrderStatus";
 import orderService from "../service/orderService";
 type CreateProps = {
-  email: string;
+  phone: string;
   publishId: number;
   preCount: number;
 };
@@ -75,8 +75,8 @@ class OrderController extends BaseController {
     res.json({ list });
   }
   private async create(req: Request, res: Response) {
-    let { email, preCount, publishId }: CreateProps = req.body;
-    let order = await orderService.create({ email, publishId, preCount });
+    let { phone, preCount, publishId }: CreateProps = req.body;
+    let order = await orderService.create({ phone, publishId, preCount });
     res.json(order);
   }
   private async buyForMobile(req: Request, res: Response) {

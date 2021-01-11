@@ -27,17 +27,17 @@ export class Customer {
     nullable: false,
     unique: true,
   })
+  phone!: string;
+  @Column({
+    length: 128,
+    nullable: true,
+  })
   email!: string;
   @Column({
     length: 128,
     nullable: true,
   })
   name!: string;
-  @Column({
-    length: 128,
-    nullable: true,
-  })
-  phone!: string;
   @Column({
     length: 128,
     nullable: true,
