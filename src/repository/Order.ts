@@ -9,7 +9,14 @@ class OrderRepository extends BaseRepository<Order, number> {
   }
   async findByIdWithRelation(id: number) {
     let result = await this.getRepository().findOne({
-      relations: ["publish", "publish.activity", "customer", "publish.machine"],
+      relations: [
+        "publish",
+        "publish.activity",
+        "customer",
+        "publish.machine",
+        "publish.activity.images",
+        "publish.activity.videos",
+      ],
       where: { id },
     });
     return result;
