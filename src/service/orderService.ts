@@ -54,6 +54,8 @@ class OrderService {
     orders.forEach((order) => {
       sendSMSService.sendBuyLink(
         order.publish.activity.code,
+        order.publish.activity.name,
+        order.publish.activity.finalPrice,
         `${ORDER_MOBILE_PAGE}/${order.id}`,
         order.customer.phone
       );

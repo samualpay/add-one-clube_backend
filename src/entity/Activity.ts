@@ -29,6 +29,12 @@ export class Activity {
   @Column({
     length: 128,
     nullable: false,
+    default: "",
+  })
+  name!: string;
+  @Column({
+    length: 128,
+    nullable: false,
   })
   description!: string;
   @Column({

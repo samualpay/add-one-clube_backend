@@ -10,6 +10,7 @@ export type ActivityDto = {
   code: string;
   images: ActivityImageDto[];
   videos: ActivityImageDto[];
+  name: string;
   description: string;
   start_at: number;
   end_at: number;

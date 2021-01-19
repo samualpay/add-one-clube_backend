@@ -22,10 +22,6 @@ class ActivityService {
     }
   }
   private validTimes(activity: ActivityDto) {
-    let now = new Date().getTime() / 1000;
-    if (now > activity.start_at) {
-      throw new HttpException(400, "開始時間錯誤");
-    }
     if (activity.end_at < activity.start_at) {
       throw new HttpException(400, "結束時間須晚於開始時間");
     }
@@ -54,14 +50,31 @@ class ActivityService {
     }
   }
   private validActivity(activity: ActivityDto) {
+    if (!activity.code || !activity.name) {
+      throw new HttpException(400, "請填寫完整資訊");
+    }
     this.validImages(activity);
     this.validTimes(activity);
     this.validDicounts(activity.discounts);
   }
-  async create(userId: number, activity: ActivityDto) {
+  private validActivityForCreate(activity: ActivityDto) {
     this.validActivity(activity);
+    let now = new Date().getTime() / 1000;
+    if (now > activity.start_at) {
+      throw new HttpException(400, "開始時間錯誤");
+    }
+  }
+  async create(userId: number, activity: ActivityDto) {
+    this.validActivityForCreate(activity);
+    let temp = await activityRepository.findOne({
+      where: { code: activity.code, userId: userId },
+    });
+    if (temp) {
+      throw new HttpException(400, "活動編碼已存在");
+    }
     let entity = activityRepository.create({
       code: activity.code,
+      name: activity.name,
       description: activity.description,
       start_at: activity.start_at,
       end_at: activity.end_at,
@@ -104,6 +117,7 @@ class ActivityService {
       throw new HttpException(400, "activity can't modify when status is end");
     }
     entity.code = activity.code;
+    entity.name = activity.name;
     entity.description = activity.description;
     entity.start_at = activity.start_at;
     entity.end_at = activity.end_at;
@@ -240,7 +254,8 @@ class ActivityService {
     let act = await this.getActivity({ activityId, activity });
     act.status = ActivityStatus.END;
     act = await this.updateFinalPrice({ activity: act, updateNow });
-    orderService.sendMailToCutomerByActivityId(act.id);
+    orderService.sendSMSToCustomerByActivityId(act.id);
+    // orderService.sendMailToCutomerByActivityId(act.id);
     return act;
   }
 }
