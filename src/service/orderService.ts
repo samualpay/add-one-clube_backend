@@ -47,6 +47,7 @@ class OrderService {
     });
     order = await orderRepository.save(order);
     await publishService.updateCount({ publishId });
+    sendSMSService.sendPreorderSMS(publish.activity.code, phone);
     return order;
   }
   async sendSMSToCustomerByActivityId(activityId: number) {
@@ -106,8 +107,16 @@ class OrderService {
     //todo need change when payment implement
     order.status = OrderStatus.PAID;
     order.customer = customer;
-    await orderRepository.save(order);
-    await customerRepository.save(customer);
+    order = await orderRepository.save(order);
+    customer = await customerRepository.save(customer);
+    sendSMSService.sendAfterBuySMS(
+      customer.phone,
+      order.publish.activity.code,
+      order.publish.activity.name,
+      order.buyCount,
+      order.totalPrice,
+      customer.address
+    );
   }
 }
 export default new OrderService();

@@ -1,5 +1,7 @@
 import axios, { Method } from "axios";
 import qs from "qs";
+import { LogLevel } from "../enum/LogLevel";
+import logService from "./logService";
 
 class SendEmailService {
   send(phone: string, content: string) {
@@ -22,12 +24,28 @@ class SendEmailService {
       },
       data: data,
     };
-    return axios(config).then((result) => {
-      let msgid: string = result.data.match(/msgid=([0-9]+)/)[1];
-      let statusCode: string = result.data.match(/statuscode=([0-9]+)/)[1];
-      let accountPoint: string = result.data.match(/AccountPoint=([0-9]+)/)[1];
-      return { msgid, statusCode, accountPoint };
-    });
+    return axios(config)
+      .then((result) => {
+        let msgid: string = result.data.match(/msgid=([0-9]+)/)[1];
+        let statusCode: string = result.data.match(/statuscode=([0-9]+)/)[1];
+        let accountPoint: string = result.data.match(
+          /AccountPoint=([0-9]+)/
+        )[1];
+        const response = { msgid, statusCode, accountPoint };
+        logService.log({
+          level: LogLevel.INFO,
+          key: "SMS",
+          content: JSON.stringify(response),
+        });
+        return response;
+      })
+      .catch((err) => {
+        logService.log({
+          level: LogLevel.ERROR,
+          key: "SMS",
+          content: JSON.stringify(err),
+        });
+      });
   }
   sendPreorderSMS(activityCode: string, phone: string) {
     const content = `感謝您參與本公司(${activityCode})。\n有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
@@ -47,11 +65,11 @@ class SendEmailService {
     phone: string,
     activityCode: string,
     activityName: string,
-    amount: string,
-    totalPrice: string,
+    buyCount: number,
+    totalPrice: number,
     address: string
   ) {
-    const content = `感謝您購買(${activityCode})的(品名:${activityName} 數量：${amount})，消費總金額為(${totalPrice})，我們會盡快將產品派送到(${address})，敬請期待。\n有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
+    const content = `感謝您購買(${activityCode})的(品名:${activityName} 數量：${buyCount})，消費總金額為(${totalPrice})，我們會盡快將產品派送到(${address})，敬請期待。\n有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
     return this.send(phone, content);
   }
 }
