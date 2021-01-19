@@ -21,6 +21,14 @@ type QueryProps = {
   status?: OrderStatus;
 };
 class OrderService {
+  onCreateValid({ phone, publishId, preCount }: CreateProps) {
+    if (!/^09[0-9]{8}$/.test(phone)) {
+      throw new HttpException(400, "電話號碼格式錯誤");
+    }
+    if (!preCount || preCount <= 0) {
+      throw new HttpException(400, "預約數量錯誤");
+    }
+  }
   async find(userId: number, { activityId, machineId, status }: QueryProps) {
     let list = await orderRepository.query({
       userId,
@@ -31,6 +39,7 @@ class OrderService {
     return list;
   }
   async create({ phone, publishId, preCount }: CreateProps) {
+    this.onCreateValid({ phone, publishId, preCount });
     let customer = await customerRepository.findOne({ where: { phone } });
     if (!customer) {
       customer = customerRepository.create({ phone });
