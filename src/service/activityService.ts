@@ -216,11 +216,11 @@ class ActivityService {
     let now = new Date().getTime() / 1000;
     for (let i = 0; i < activitys.length; i++) {
       let elem = activitys[i];
-      if (elem.status === ActivityStatus.NOT_STARTED && elem.start_at < now) {
+      if (elem.status === ActivityStatus.NOT_STARTED && elem.start_at <= now) {
         elem.status = ActivityStatus.START;
         update.push(elem);
       }
-      if (elem.status === ActivityStatus.START && elem.end_at < now) {
+      if (elem.status === ActivityStatus.START && elem.end_at <= now) {
         elem = await this.updateActivityStatusToEnd({
           activity: elem,
           updateNow: false,
