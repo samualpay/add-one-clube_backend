@@ -10,7 +10,7 @@
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/node_modules/ts-node/dist/bin.js",
-      "args": ["${workspaceFolder}/test.ts"],
+      "args": ["${workspaceFolder}/src/server.ts"],
       "cwd": "${workspaceRoot}",
       "protocol": "inspector"
     }

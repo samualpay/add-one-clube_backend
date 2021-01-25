@@ -26,7 +26,7 @@ class SendEmailService {
     };
     return axios(config)
       .then((result) => {
-        let msgid: string = result.data.match(/msgid=([0-9]+)/)[1];
+        let msgid: string = result.data.match(/msgid=([#]?\w+)\r/)[1];
         let statusCode: string = result.data.match(/statuscode=([0-9]+)/)[1];
         let accountPoint: string = result.data.match(
           /AccountPoint=([0-9]+)/
