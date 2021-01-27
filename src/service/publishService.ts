@@ -69,12 +69,22 @@ class PublishService {
   }
   async updateCount({ publishId, publish }: PublishProps) {
     let pub = await this.getPublish({ publishId, publish });
-    let registerCount = pub.orders.length;
-    let buyCount = pub.orders.filter(
-      (order) => order.status !== OrderStatus.PREORDER
-    ).length;
-    pub.registeredCount = registerCount;
-    pub.buyCount = buyCount;
+
+    let registeredPeople: number[] = [];
+    let buyPeople: number[] = [];
+    pub.orders.forEach((order) => {
+      if (!registeredPeople.includes(order.customerId)) {
+        registeredPeople.push(order.customerId);
+      }
+      if (
+        order.status !== OrderStatus.PREORDER &&
+        !buyPeople.includes(order.customerId)
+      ) {
+        buyPeople.push(order.customerId);
+      }
+    });
+    pub.registeredCount = registeredPeople.length;
+    pub.buyCount = buyPeople.length;
     pub = await publishRepository.save(pub);
     await activityService.updateActivityCounts(pub.activityId);
     return pub;

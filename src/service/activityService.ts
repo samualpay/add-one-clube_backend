@@ -8,6 +8,7 @@ import publishService from "./publishService";
 import orderService from "./orderService";
 import activityImageRepository from "../repository/activityImageRepository";
 import activityVideoRepository from "../repository/activityVideoRepository";
+import { OrderStatus } from "../enum/OrderStatus";
 const discountError = new HttpException(400, "階層設定異常");
 type activityProps = {
   activityId?: number;
@@ -176,18 +177,33 @@ class ActivityService {
     if (!activity) {
       throw new HttpException(400, "activity not found");
     }
-    let publishs = await publishService.findByActivityId(activityId);
-    let { buyCount, registeredCount, linkCount } = publishs.reduce(
+    let publishs = await publishService.findByActivityIdWithRelation(
+      activityId
+    );
+    let { buyPeople, registeredPeople, linkCount } = publishs.reduce<{
+      buyPeople: number[];
+      registeredPeople: number[];
+      linkCount: number;
+    }>(
       (acc, cur) => {
-        acc.buyCount += cur.buyCount;
         acc.linkCount += cur.linkCount;
-        acc.registeredCount += cur.registeredCount;
+        cur.orders.forEach((order) => {
+          if (!acc.registeredPeople.includes(order.customerId)) {
+            acc.registeredPeople.push(order.customerId);
+          }
+          if (
+            order.status !== OrderStatus.PREORDER &&
+            !acc.buyPeople.includes(order.customerId)
+          ) {
+            acc.buyPeople.push(order.customerId);
+          }
+        });
         return acc;
       },
-      { buyCount: 0, registeredCount: 0, linkCount: 0 }
+      { buyPeople: [], registeredPeople: [], linkCount: 0 }
     );
-    activity.registeredCount = registeredCount;
-    activity.buyCount = buyCount;
+    activity.registeredCount = registeredPeople.length;
+    activity.buyCount = buyPeople.length;
     activity.linkCount = linkCount;
     await activityRepository.save(activity);
   }
