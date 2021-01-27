@@ -124,7 +124,17 @@ class OrderService {
       order.publish.activity.name,
       order.buyCount,
       order.totalPrice,
-      customer.address
+      customer.address,
+      `${ORDER_MOBILE_PAGE}/finish/${order.id}`
+    );
+    sendEmailService.sendAfterBuyEmail(
+      customer.email,
+      order.publish.activity.code,
+      order.publish.activity.name,
+      order.buyCount,
+      order.totalPrice,
+      customer.address,
+      `${ORDER_MOBILE_PAGE}/finish/${order.id}`
     );
   }
 }
