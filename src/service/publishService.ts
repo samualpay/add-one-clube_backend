@@ -23,10 +23,10 @@ class PublishService {
   private addUrlForPublishs(publishs: Publish[]) {
     return publishs.map((publish) => this.addUrlForPublish(publish));
   }
-  async findByActivityId(activityId: number) {
-    let publishs: Publish[] = await publishRepository.find({
-      where: { activityId },
-    });
+  async findByActivityIdWithOrders(activityId: number) {
+    let publishs: Publish[] = await publishRepository.findByActivityIdWithOrders(
+      activityId
+    );
     return publishs;
   }
   async findByActivityIdWithRelation(activityId: number) {

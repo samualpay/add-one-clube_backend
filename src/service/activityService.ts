@@ -177,9 +177,7 @@ class ActivityService {
     if (!activity) {
       throw new HttpException(400, "activity not found");
     }
-    let publishs = await publishService.findByActivityIdWithRelation(
-      activityId
-    );
+    let publishs = await publishService.findByActivityIdWithOrders(activityId);
     let { buyPeople, registeredPeople, linkCount } = publishs.reduce<{
       buyPeople: number[];
       registeredPeople: number[];
