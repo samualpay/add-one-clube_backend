@@ -1,11 +1,7 @@
 import { Request, Response } from "express";
 import { Rout } from "type/Rout";
 import BaseController from "./BaseController";
-import userRepository from "../repository/User";
-import { LoginResult } from "../dto/LoginResult";
-import { RegisterResult } from "../dto/RegisterResult";
-import common from "../common";
-import HttpException from "../exception/HttpException";
+import userService from "../service/userService";
 type loginRequestBody = {
   username: string;
   password: string;
@@ -27,36 +23,13 @@ class AuthController extends BaseController {
     ];
   }
   private async login(req: Request, res: Response) {
-    const body: loginRequestBody = req.body;
-    console.log(body);
-    let result: LoginResult | undefined;
-    let user = await userRepository.findByUsername(body.username);
-    if (!user || user.password !== body.password) {
-      throw new HttpException(400, "帳號或密碼錯誤");
-    } else {
-      const { token, expireTime } = common.createToken({ id: user.id });
-      result = {
-        username: user.username,
-        token,
-        expireTime,
-      };
-    }
+    const { username, password }: loginRequestBody = req.body;
+    let result = await userService.login({ username, password });
     res.json(result);
   }
   private async register(req: Request, res: Response) {
-    const body: loginRequestBody = req.body;
-    let result: RegisterResult | undefined;
-    let user = await userRepository.findByUsername(body.username);
-    if (user) {
-      throw new HttpException(400, "帳號已存在");
-    } else {
-      let entity = userRepository.create({
-        username: body.username,
-        password: body.password,
-      });
-      await userRepository.save(entity);
-      result = { isSuccess: true, message: null };
-    }
+    const { username, password }: loginRequestBody = req.body;
+    let result = await userService.register({ username, password });
     res.json(result);
   }
 }

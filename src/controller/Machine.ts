@@ -1,15 +1,12 @@
 import { Request, Response } from "express";
 import { Rout } from "type/Rout";
 import BaseController from "./BaseController";
-import userRepository from "../repository/User";
-import { LoginResult } from "../dto/LoginResult";
-import { RegisterResult } from "../dto/RegisterResult";
-import common from "../common";
 import HttpException from "../exception/HttpException";
 import auth from "../middleware/auth";
 import { MachineDTO } from "../dto/MachineDTO";
-import machineRepository from "../repository/Machine";
+// import machineRepository from "../repository/machineRepository";
 import { Machine } from "../entity/Machine";
+import machineService from "../service/machineService";
 
 class MachineController extends BaseController {
   public path = "/api/machines";
@@ -44,45 +41,23 @@ class MachineController extends BaseController {
   private async createMachine(req: Request, res: Response) {
     let userId = req.userId;
     let machine: MachineDTO = req.body;
-    let entity = machineRepository.create({
-      code: machine.code,
-      city: machine.city,
-      dist: machine.dist,
-      address: machine.address,
-      area: machine.area,
-      machineType: machine.machineType,
-      storeAttribute: machine.storeAttribute,
-      userId: userId,
-    });
-    let result = await machineRepository.save(entity);
+    let result = await machineService.createMachine({ ...machine, userId });
     res.json(result);
   }
   private async findAll(req: Request, res: Response) {
     let userId = req.userId;
-    let machines: Machine[] = await machineRepository.findByUserId(userId);
+    let machines: Machine[] = await machineService.findByUserid(userId);
     res.json({ machines });
   }
   private async delete(req: Request, res: Response) {
     let id: number = parseInt(req.params.id);
-    await machineRepository.deleteById(id);
+    await machineService.deleteById(id);
     res.json({});
   }
   private async update(req: Request, res: Response) {
     let machine: MachineDTO = req.body;
-    let entity = await machineRepository.findById(machine.id);
-    if (entity) {
-      entity.code = machine.code;
-      entity.city = machine.city;
-      entity.dist = machine.dist;
-      entity.address = machine.address;
-      entity.area = machine.area;
-      entity.machineType = machine.machineType;
-      entity.storeAttribute = machine.storeAttribute;
-      let result = await machineRepository.save(entity);
-      res.json(result);
-    } else {
-      throw new HttpException(400, "machine not found");
-    }
+    let result = await machineService.updateMachine(machine);
+    res.json(result);
   }
 }
 export default MachineController;

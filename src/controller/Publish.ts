@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Rout } from "type/Rout";
 import BaseController from "./BaseController";
 import auth from "../middleware/auth";
-import machineRepository from "../repository/Machine";
+import machineRepository from "../repository/machineRepository";
 import activityRepository from "../repository/activityRepository";
 import publishRepository from "../repository/publishRepository";
 import { Publish } from "../entity/Publish";

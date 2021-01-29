@@ -12,6 +12,7 @@ import OrderController from "./controller/Order";
 import OrderMobileController from "./controller/mobile/OrderMobileController";
 import PublishMobileController from "./controller/mobile/PublishMobileController";
 import * as tasks from "./cronjob";
+import MachineApiController from "./controller/machine/MachineAPI";
 const port = process.env.PORT || "5000";
 const app = new App({
   port: parseInt(port),
@@ -25,6 +26,7 @@ const app = new App({
     new OrderController(),
     new OrderMobileController(),
     new PublishMobileController(),
+    new MachineApiController(),
   ],
   middleWares: [bodyParser.json(), bodyParser.urlencoded({ extended: true })],
 });
