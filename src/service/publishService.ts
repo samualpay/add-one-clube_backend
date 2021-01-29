@@ -43,6 +43,13 @@ class PublishService {
     let list = this.addUrlForPublishs(publishs);
     return list;
   }
+  async findByMachineIdAndActivityStatusIsStartAndPublish(machineId: number) {
+    let publishs: Publish[] = await publishRepository.findByMachineIdAndActivityStatusAndPublish(
+      machineId,
+      ActivityStatus.START
+    );
+    return publishs;
+  }
   async getPublish({ publishId, publish }: PublishProps): Promise<Publish> {
     if (!publish && publishId) {
       publish = await publishRepository.findByIdWithOrders(publishId);

@@ -9,6 +9,7 @@ import orderService from "./orderService";
 import activityImageRepository from "../repository/activityImageRepository";
 import activityVideoRepository from "../repository/activityVideoRepository";
 import { OrderStatus } from "../enum/OrderStatus";
+import { transfer } from "../dto/ActivtyDTOForMachine";
 const discountError = new HttpException(400, "階層設定異常");
 type activityProps = {
   activityId?: number;
@@ -271,6 +272,12 @@ class ActivityService {
     orderService.sendSMSToCustomerByActivityId(act.id);
     // orderService.sendMailToCutomerByActivityId(act.id);
     return act;
+  }
+  async findPublishActivitysForMachine(machineId: number) {
+    let publishs = await publishService.findByMachineIdAndActivityStatusIsStartAndPublish(
+      machineId
+    );
+    return publishs.map((publish) => transfer(publish.activity));
   }
 }
 export default new ActivityService();
