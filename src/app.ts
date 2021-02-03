@@ -3,7 +3,8 @@ import express, { RequestHandler } from 'express'
 import { Application } from 'express'
 import errorMiddleware from './middleware/errorMiddleware'
 import path from 'path'
-
+import swaggerUI from 'swagger-ui-express'
+import swaggerDocument from './swagger'
 class App {
     public app: Application
     public port: number
@@ -21,6 +22,7 @@ class App {
         this.app.use(middleWares)
     }
     private routes(controllers: BaseController[]) {
+        this.app.use('/api-docs',swaggerUI.serve,swaggerUI.setup(swaggerDocument))
         controllers.forEach(({ path, router }) => {
             this.app.use(path, router)
         })

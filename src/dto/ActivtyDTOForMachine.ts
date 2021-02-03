@@ -18,6 +18,8 @@ export type ActivityForMachineDto = {
   price: number;
   discounts: DiscountDto[];
   discountPrice: number;
+  linkCount: number;
+  registeredCount: number;
 };
 
 export function transfer(activity: Activity): ActivityForMachineDto {
@@ -43,5 +45,7 @@ export function transfer(activity: Activity): ActivityForMachineDto {
     price,
     discounts,
     discountPrice,
+    linkCount: activity.linkCount,
+    registeredCount: activity.registeredCount,
   };
 }
