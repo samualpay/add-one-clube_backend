@@ -191,6 +191,11 @@ export default {
           default: 1000,
           description: "預購人數",
         },
+        link: {
+          type: "string",
+          default: "http://207.148.113.123/publish/1",
+          description: "",
+        },
       },
     },
     discount: {

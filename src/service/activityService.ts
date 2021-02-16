@@ -10,6 +10,8 @@ import activityImageRepository from "../repository/activityImageRepository";
 import activityVideoRepository from "../repository/activityVideoRepository";
 import { OrderStatus } from "../enum/OrderStatus";
 import { transfer } from "../dto/ActivtyDTOForMachine";
+const publishMobilePage =
+  process.env.PUBLISH_MOBILE_PAGE || "http://localhost:3000/mobile/publish";
 const discountError = new HttpException(400, "階層設定異常");
 type activityProps = {
   activityId?: number;
@@ -277,7 +279,11 @@ class ActivityService {
     let publishs = await publishService.findByMachineIdAndActivityStatusIsStartAndPublish(
       machineId
     );
-    return publishs.map((publish) => transfer(publish.activity));
+    return publishs.map((publish) => {
+      let obj = transfer(publish.activity);
+      let link = `${publishMobilePage}/${publish.id}`;
+      return { ...obj, link };
+    });
   }
 }
 export default new ActivityService();
