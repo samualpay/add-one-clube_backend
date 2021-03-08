@@ -56,7 +56,11 @@ class OrderService {
     });
     order = await orderRepository.save(order);
     await publishService.updateCount({ publishId });
-    sendSMSService.sendPreorderSMS(publish.activity.code, phone);
+    sendSMSService.sendPreorderSMS(
+      publish.activity.code,
+      phone,
+      `${ORDER_MOBILE_PAGE}/detail/${order.id}`
+    );
     return order;
   }
   async sendSMSToCustomerByActivityId(activityId: number) {
@@ -97,6 +101,15 @@ class OrderService {
     // this.checkOrderCanBuy(order);
     return order;
   }
+  async setOrderStatus(id: number, status: OrderStatus) {
+    let order = await orderRepository.findById(id);
+    if (!order) {
+      throw new HttpException(400, "訂單不存在");
+    }
+    order.status = status;
+    order = await orderRepository.save(order);
+    return order;
+  }
   async buyForMobile(
     id: number,
     name: string,
@@ -125,7 +138,7 @@ class OrderService {
       order.buyCount,
       order.totalPrice,
       customer.address,
-      `${ORDER_MOBILE_PAGE}/finish/${order.id}`
+      `${ORDER_MOBILE_PAGE}/detail/${order.id}`
     );
     sendEmailService.sendAfterBuyEmail(
       customer.email,
@@ -134,7 +147,7 @@ class OrderService {
       order.buyCount,
       order.totalPrice,
       customer.address,
-      `${ORDER_MOBILE_PAGE}/finish/${order.id}`
+      `${ORDER_MOBILE_PAGE}/detail/${order.id}`
     );
   }
 }

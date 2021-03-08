@@ -47,8 +47,8 @@ class SendEmailService {
         });
       });
   }
-  sendPreorderSMS(activityCode: string, phone: string) {
-    const content = `感謝您參與本公司(${activityCode})。\n有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
+  sendPreorderSMS(activityCode: string, phone: string, link: string) {
+    const content = `感謝您參與本公司(${activityCode})。\n，請到下方網址確認預購資訊（${link}）\n有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
     return this.send(phone, content);
   }
   sendBuyLink(
@@ -70,7 +70,7 @@ class SendEmailService {
     address: string,
     link: string
   ) {
-    const content = `感謝您購買(${activityCode})的(品名:${activityName} 數量：${buyCount})，消費總金額為(${totalPrice})，我們會盡快將產品派送到(${address})，敬請期待。\n，如果您確定要購買，請到下方網址（${link}）\n有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
+    const content = `感謝您購買(${activityCode})的(品名:${activityName} 數量：${buyCount})，消費總金額為(${totalPrice})，我們會盡快將產品派送到(${address})，敬請期待。\n，請到下方網址確認訂單（${link}）\n有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
     return this.send(phone, content);
   }
 }

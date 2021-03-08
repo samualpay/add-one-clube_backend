@@ -21,6 +21,10 @@ type BuyProps = {
   phone: string;
   buyCount: number;
 };
+type PatchProps = {
+  id: number;
+  status: OrderStatus;
+};
 class OrderController extends BaseController {
   public path = "/api/orders";
   initRoutes(): Rout[] {
@@ -43,12 +47,12 @@ class OrderController extends BaseController {
         middleware: [],
         runner: this.buyForMobile,
       },
-      // {
-      //   action: "/activity/:id",
-      //   method: "patch",
-      //   middleware: [auth],
-      //   runner: this.publishByActivityId,
-      // },
+      {
+        action: "/",
+        method: "patch",
+        middleware: [auth],
+        runner: this.patch,
+      },
     ];
   }
 
@@ -88,6 +92,11 @@ class OrderController extends BaseController {
       address,
       buyCount
     );
+    res.json(order);
+  }
+  private async patch(req: Request, res: Response) {
+    let { id, status }: PatchProps = req.body;
+    let order = await orderService.setOrderStatus(id, status);
     res.json(order);
   }
 }

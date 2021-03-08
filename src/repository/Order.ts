@@ -16,6 +16,7 @@ class OrderRepository extends BaseRepository<Order, number> {
         "publish.machine",
         "publish.activity.images",
         "publish.activity.videos",
+        "publish.activity.discounts",
       ],
       where: { id },
     });
