@@ -63,6 +63,11 @@ class PublishRepository extends BaseRepository<Publish, number> {
       where: { machineId, activityId },
     });
   }
+  findCountByActivityId(activityId: number) {
+    return this.getRepository().count({
+      where: { activityId },
+    });
+  }
 }
 
 export default new PublishRepository();

@@ -34,6 +34,12 @@ class PublishController extends BaseController {
         runner: this.findByActivityId,
       },
       {
+        action: "/activity/:id/count",
+        method: "get",
+        middleware: [],
+        runner: this.findCountByActivityId,
+      },
+      {
         action: "/machine/:id",
         method: "get",
         middleware: [],
@@ -70,6 +76,11 @@ class PublishController extends BaseController {
     let activityId: number = parseInt(req.params.id);
     let list = await publishService.findByActivityIdWithRelation(activityId);
     res.json({ list });
+  }
+  private async findCountByActivityId(req: Request, res: Response) {
+    let activityId: number = parseInt(req.params.id);
+    let result = await publishService.findCountByActivityId(activityId);
+    res.json(result);
   }
 
   private async findByMachineId(req: Request, res: Response) {

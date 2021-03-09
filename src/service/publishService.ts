@@ -108,5 +108,9 @@ class PublishService {
     this.addLinkCountForPubilish({ publishId: id });
     return pub;
   }
+  async findCountByActivityId(activityId: number) {
+    let count = await publishRepository.findCountByActivityId(activityId);
+    return { count };
+  }
 }
 export default new PublishService();
