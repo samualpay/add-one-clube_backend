@@ -131,6 +131,7 @@ class OrderService {
     order.customer = customer;
     order = await orderRepository.save(order);
     customer = await customerRepository.save(customer);
+    await publishService.updateCount({ publishId: order.publishId });
     sendSMSService.sendAfterBuySMS(
       customer.phone,
       order.publish.activity.code,
