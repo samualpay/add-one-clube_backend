@@ -3,6 +3,7 @@ import { Rout } from "type/Rout";
 import BaseController from "../BaseController";
 import { OrderStatus } from "../../enum/OrderStatus";
 import orderService from "../../service/orderService";
+import activityService from "../../service/activityService";
 type CreateProps = {
   phone: string;
   publishId: number;
@@ -37,6 +38,12 @@ class OrderMobileController extends BaseController {
         middleware: [],
         runner: this.buy,
       },
+      {
+        action: "/activity/:id/registeredCount",
+        method: "get",
+        middleware: [],
+        runner: this.getRegisterCountById,
+      },
       // {
       //   action: "/activity/:id",
       //   method: "patch",
@@ -65,6 +72,11 @@ class OrderMobileController extends BaseController {
       body.buyCount
     );
     res.json({});
+  }
+  private async getRegisterCountById(req: Request, res: Response) {
+    let id: number = parseInt(req.params.id);
+    let registeredCount = await activityService.findRegisterCountById(id);
+    res.json({ registeredCount });
   }
 }
 export default OrderMobileController;

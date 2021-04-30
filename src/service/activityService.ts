@@ -285,5 +285,12 @@ class ActivityService {
       return { ...obj, link };
     });
   }
+  async findRegisterCountById(activityId: number) {
+    const entity = await activityRepository.findRegisterCountById(activityId);
+    if (!entity) {
+      throw new HttpException(400, "activity not found");
+    }
+    return entity.registeredCount;
+  }
 }
 export default new ActivityService();

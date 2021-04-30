@@ -34,6 +34,12 @@ class ActivityRepository extends BaseRepository<Activity, number> {
       where: { status: Not(status) },
     });
   }
+  async findRegisterCountById(id: number) {
+    return this.getRepository().findOne({
+      where: { id },
+      select: ["registeredCount"],
+    });
+  }
 }
 
 export default new ActivityRepository();
