@@ -253,7 +253,7 @@ class ActivityService {
     let price = act.price;
     let discounts = act.discounts.sort((a, b) => a.level - b.level);
     discounts.forEach((discount) => {
-      if (act.registeredCount > discount.peopleCount) {
+      if (act.registeredCount >= discount.peopleCount) {
         finalPrice = (price / 100) * discount.percent;
       }
     });
