@@ -49,6 +49,12 @@ class OrderService {
     if (!publish || publish.activity.status !== ActivityStatus.START) {
       throw new HttpException(400, "活動不存在");
     }
+    if (
+      publish.activity.total_count &&
+      publish.activity.total_count <= publish.activity.preorderProductItem
+    ) {
+      throw new HttpException(400, "活動商品已經訂購一空");
+    }
     let order = orderRepository.create({
       preCount,
       publish,
@@ -70,6 +76,7 @@ class OrderService {
         order.publish.activity.code,
         order.publish.activity.name,
         order.publish.activity.finalPrice,
+        order.publish.activity.pay_end_at,
         `${ORDER_MOBILE_PAGE}/${order.id}`,
         order.customer.phone
       );
@@ -86,10 +93,12 @@ class OrderService {
     });
   }
   private checkOrderCanBuy(order?: Order): Order {
+    const now = new Date().getTime() / 1000;
     if (
       !order ||
       order.status !== OrderStatus.PREORDER ||
-      order.publish.activity.status !== ActivityStatus.END
+      order.publish.activity.status !== ActivityStatus.END ||
+      order.publish.activity.pay_end_at <= now
     ) {
       throw new HttpException(400, "訂單異常");
     } else {

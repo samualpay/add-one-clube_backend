@@ -2,7 +2,7 @@ import axios, { Method } from "axios";
 import qs from "qs";
 import { LogLevel } from "../enum/LogLevel";
 import logService from "./logService";
-
+import moment from "moment";
 class SendEmailService {
   send(phone: string, content: string) {
     const data = qs.stringify({
@@ -55,10 +55,13 @@ class SendEmailService {
     activityCode: string,
     activityName: string,
     finalPrice: number,
+    payEndAt: number,
     link: string,
     phone: string
   ) {
-    const content = `感謝您的等候，（${activityCode}）（${activityName}）最終價格為（${finalPrice}），如果您確定要購買，請到下方網址（${link}），完成送貨資料及付款設定。\n再次感謝您的參與～有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
+    const m = moment(payEndAt * 1000);
+    const payEndAtS = m.format("YYYY年MM月DD日");
+    const content = `感謝您的等候，（${activityCode}）（${activityName}）最終價格為（${finalPrice}），如果您確定要購買，請到下方網址（${link}），完成送貨資料及付款設定。\n再次感謝您的參與～有任何問題可撥打(02)16881688，會有專人與您聯繫。 請於${payEndAtS}完成訂購`;
     return this.send(phone, content);
   }
   sendAfterBuySMS(
