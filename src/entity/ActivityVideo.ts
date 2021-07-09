@@ -6,15 +6,13 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   UpdateDateColumn,
+  PrimaryColumn,
 } from "typeorm";
 import { Activity } from "./Activity";
 @Entity("activity_video")
 export class ActivityVideo {
-  @PrimaryGeneratedColumn()
-  id!: number;
-  @Column({
+  @PrimaryColumn({
     length: 128,
-    nullable: false,
   })
   fileName!: string;
   @ManyToOne((type) => Activity, (activity) => activity.videos, {
@@ -22,10 +20,13 @@ export class ActivityVideo {
   })
   @JoinColumn({ name: "activityId" })
   activity!: Activity;
-  @Column({
-    nullable: true,
-  })
+  @PrimaryColumn()
   activityId!: number;
+  @Column({
+    nullable: false,
+    default: 0,
+  })
+  order!: number;
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
   @UpdateDateColumn({ type: "timestamp" })

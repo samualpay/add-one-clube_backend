@@ -29,6 +29,9 @@ class ActivityService {
     if (activity.end_at < activity.start_at) {
       throw new HttpException(400, "結束時間須晚於開始時間");
     }
+    if (activity.pay_end_at < activity.end_at) {
+      throw new HttpException(400, "購買截止日不得早於結束時間");
+    }
   }
   private validDicounts(discounts: DiscountDto[]) {
     for (let i = 0; i < discounts.length; i++) {
@@ -82,17 +85,12 @@ class ActivityService {
       description: activity.description,
       start_at: activity.start_at,
       end_at: activity.end_at,
+      pay_end_at: activity.pay_end_at,
       price: activity.price,
+      total_count: activity.total_count,
       userId: userId,
     });
-    let images = activity.images.map((elem) => {
-      let item = activityImageRepository.create({ fileName: elem.fileName });
-      return item;
-    });
-    let videos = activity.videos.map((elem) => {
-      let item = activityVideoRepository.create({ fileName: elem.fileName });
-      return item;
-    });
+
     let discountEntitys = activity.discounts.map((elem, index) => {
       let level = index + 1;
       let item = discountRepository.create({
@@ -103,9 +101,25 @@ class ActivityService {
       return item;
     });
     entity.discounts = discountEntitys;
-    entity.images = images;
-    entity.videos = videos;
     let result = await activityRepository.save(entity);
+    let images = activity.images.map((elem) => {
+      let item = activityImageRepository.create({
+        activityId: result.id,
+        fileName: elem.fileName,
+        order: elem.order,
+      });
+      return item;
+    });
+    let videos = activity.videos.map((elem) => {
+      let item = activityVideoRepository.create({
+        activityId: result.id,
+        fileName: elem.fileName,
+        order: elem.order,
+      });
+      return item;
+    });
+    result.images = await activityImageRepository.bulkSave(images);
+    result.videos = await activityVideoRepository.bulkSave(videos);
     return result;
   }
   async update(userId: number, activity: ActivityDto) {
@@ -126,12 +140,22 @@ class ActivityService {
     entity.start_at = activity.start_at;
     entity.end_at = activity.end_at;
     entity.price = activity.price;
+    entity.pay_end_at = activity.pay_end_at;
+    entity.total_count = activity.total_count;
     let images = activity.images.map((elem) => {
-      let item = activityImageRepository.create({ fileName: elem.fileName });
+      let item = activityImageRepository.create({
+        activityId: entity?.id,
+        fileName: elem.fileName,
+        order: elem.order,
+      });
       return item;
     });
     let videos = activity.videos.map((elem) => {
-      let item = activityVideoRepository.create({ fileName: elem.fileName });
+      let item = activityVideoRepository.create({
+        activityId: entity?.id,
+        fileName: elem.fileName,
+        order: elem.order,
+      });
       return item;
     });
     let discountEntitys = activity.discounts.map((elem, index) => {
@@ -145,6 +169,8 @@ class ActivityService {
     entity.discounts = discountEntitys;
     entity.images = images;
     entity.videos = videos;
+    await activityImageRepository.delete({ activityId: entity.id });
+    await activityVideoRepository.delete({ activityId: entity.id });
     let result = await activityRepository.save(entity);
     return result;
   }
@@ -181,10 +207,16 @@ class ActivityService {
       throw new HttpException(400, "activity not found");
     }
     let publishs = await publishService.findByActivityIdWithOrders(activityId);
-    let { buyPeople, registeredPeople, linkCount } = publishs.reduce<{
+    let {
+      buyPeople,
+      registeredPeople,
+      linkCount,
+      preorderProductCount,
+    } = publishs.reduce<{
       buyPeople: number[];
       registeredPeople: number[];
       linkCount: number;
+      preorderProductCount: number;
     }>(
       (acc, cur) => {
         acc.linkCount += cur.linkCount;
@@ -198,14 +230,21 @@ class ActivityService {
           ) {
             acc.buyPeople.push(order.customerId);
           }
+          acc.preorderProductCount += order.preCount;
         });
         return acc;
       },
-      { buyPeople: [], registeredPeople: [], linkCount: 0 }
+      {
+        buyPeople: [],
+        registeredPeople: [],
+        linkCount: 0,
+        preorderProductCount: 0,
+      }
     );
     activity.registeredCount = registeredPeople.length;
     activity.buyCount = buyPeople.length;
     activity.linkCount = linkCount;
+    activity.preorderProductItem = preorderProductCount;
     await activityRepository.save(activity);
   }
   private async getActivity({

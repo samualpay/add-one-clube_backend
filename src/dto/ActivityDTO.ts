@@ -1,5 +1,6 @@
 export type ActivityImageDto = {
   fileName: string;
+  order: number;
 };
 export type DiscountDto = {
   peopleCount: number;
@@ -14,7 +15,9 @@ export type ActivityDto = {
   description: string;
   start_at: number;
   end_at: number;
+  pay_end_at: number;
   price: number;
+  total_count: number;
   discounts: DiscountDto[];
   finalPrice: number | null;
   status?: "not_started" | "start" | "end";

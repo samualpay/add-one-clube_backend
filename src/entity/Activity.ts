@@ -48,7 +48,16 @@ export class Activity {
   @Column({
     type: "int",
   })
+  pay_end_at!: number;
+  @Column({
+    type: "int",
+  })
   price!: number;
+  @Column({
+    type: "int",
+    nullable: true,
+  })
+  total_count!: number;
   @OneToMany(
     (type) => ActivityImage,
     (activityImage) => activityImage.activity,
@@ -100,9 +109,17 @@ export class Activity {
     default: 0,
     nullable: false,
   })
+  preorderProductItem!: number;
+
+  @Column({
+    type: "int",
+    default: 0,
+    nullable: false,
+  })
   buyCount!: number;
   @ManyToOne((type) => User, (user) => user.machines, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   })
   @JoinColumn({ name: "userId" })
   user!: User;
