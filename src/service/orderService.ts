@@ -8,6 +8,7 @@ import { OrderStatus } from "../enum/OrderStatus";
 import sendEmailService from "./sendEmailService";
 import { Order } from "../entity/Order";
 import sendSMSService from "./sendSMSService";
+import activityService from "./activityService";
 const ORDER_MOBILE_PAGE =
   process.env.ORDER_MOBILE_PAGE || "http://localhost:3000/mobile/order";
 type CreateProps = {
@@ -62,6 +63,9 @@ class OrderService {
     });
     order = await orderRepository.save(order);
     await publishService.updateCount({ publishId });
+    await activityService.updateActivityDiscountLevelAndFinalPrice(
+      publish.activity.id
+    );
     sendSMSService.sendPreorderSMS(
       publish.activity.code,
       phone,
@@ -79,6 +83,18 @@ class OrderService {
         order.publish.activity.pay_end_at,
         `${ORDER_MOBILE_PAGE}/${order.id}`,
         order.customer.phone
+      );
+    });
+  }
+  async sendDiscountSMSToCustomerByActivityId(activityId: number) {
+    let orders = await orderRepository.findByActivityId(activityId);
+    orders.forEach((order) => {
+      sendSMSService.sendDiscountSMS(
+        order.publish.activity.code,
+        order.publish.activity.name,
+        order.publish.activity.finalPrice,
+        order.customer.phone,
+        `${ORDER_MOBILE_PAGE}/detail/${order.id}`
       );
     });
   }

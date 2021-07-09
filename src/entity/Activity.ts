@@ -117,6 +117,14 @@ export class Activity {
     nullable: false,
   })
   buyCount!: number;
+
+  @Column({
+    type: "int",
+    default: 0,
+    nullable: false,
+  })
+  discountLevel!: number;
+
   @ManyToOne((type) => User, (user) => user.machines, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",

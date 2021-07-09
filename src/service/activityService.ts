@@ -286,6 +286,31 @@ class ActivityService {
     }
     await activityRepository.bulkSave(update);
   }
+  getDiscountLevelAndFinalPrice(act: Activity) {
+    let discounts = act.discounts.sort((a, b) => b.level - a.level);
+    discounts = discounts.filter(
+      (discount) => act.registeredCount >= discount.peopleCount
+    );
+    let level = 0;
+    let price = act.price;
+    if (discounts.length > 0) {
+      level = discounts[0].level;
+      price = Math.round((discounts[0].percent * price) / 100);
+    }
+    return { level, price };
+  }
+  async updateActivityDiscountLevelAndFinalPrice(activityId: number) {
+    let act = await this.getActivity({ activityId });
+    const { level, price } = this.getDiscountLevelAndFinalPrice(act);
+    if (level == act.discountLevel) {
+      return act;
+    }
+    act.discountLevel = level;
+    act.finalPrice = price;
+    act = await activityRepository.save(act);
+    await orderService.sendDiscountSMSToCustomerByActivityId(act.id);
+    return act;
+  }
   async updateFinalPrice({ activityId, activity, updateNow }: activityProps) {
     let act = await this.getActivity({ activityId, activity });
     let finalPrice = act.price;
@@ -309,7 +334,7 @@ class ActivityService {
   }: activityProps) {
     let act = await this.getActivity({ activityId, activity });
     act.status = ActivityStatus.END;
-    act = await this.updateFinalPrice({ activity: act, updateNow });
+    // act = await this.updateFinalPrice({ activity: act, updateNow });
     orderService.sendSMSToCustomerByActivityId(act.id);
     // orderService.sendMailToCutomerByActivityId(act.id);
     return act;

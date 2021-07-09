@@ -51,6 +51,16 @@ class SendEmailService {
     const content = `感謝您參與本公司(${activityCode})。\n，請到下方網址確認預購資訊（${link}）\n有任何問題可撥打(02)16881688，會有專人與您聯繫。`;
     return this.send(phone, content);
   }
+  sendDiscountSMS(
+    activityCode: string,
+    activityName: string,
+    finalPrice: number,
+    phone: string,
+    link: string
+  ) {
+    const content = `${activityCode}  ${activityName}  ${finalPrice}  ${link}`;
+    return this.send(phone, content);
+  }
   sendBuyLink(
     activityCode: string,
     activityName: string,
