@@ -9,6 +9,8 @@ import sendEmailService from "./sendEmailService";
 import { Order } from "../entity/Order";
 import sendSMSService from "./sendSMSService";
 import activityService from "./activityService";
+import moment from "moment";
+import { Discount } from "../entity/Discount";
 const ORDER_MOBILE_PAGE =
   process.env.ORDER_MOBILE_PAGE || "http://localhost:3000/mobile/order";
 type CreateProps = {
@@ -66,8 +68,14 @@ class OrderService {
     await activityService.updateActivityDiscountLevelAndFinalPrice(
       publish.activity.id
     );
+    const startAt = moment(publish.activity.start_at * 1000);
+    const endAt = moment(publish.activity.end_at * 1000);
+    const sendAt = moment(publish.activity.pay_end_at * 1000).add(1, "day");
     sendSMSService.sendPreorderSMS(
-      publish.activity.code,
+      publish.activity.name,
+      startAt.format("MM/DD"),
+      endAt.format("MM/DD"),
+      sendAt.format("MM/DD"),
       phone,
       `${ORDER_MOBILE_PAGE}/detail/${order.id}`
     );
@@ -76,22 +84,30 @@ class OrderService {
   async sendSMSToCustomerByActivityId(activityId: number) {
     let orders = await orderRepository.findByActivityId(activityId);
     orders.forEach((order) => {
+      const payEndAt = moment(order.publish.activity.pay_end_at * 1000);
+      const sendEndAt = payEndAt.add(1, "day");
+      const phone = order.customer.phone;
+      const checkCode = phone.substr(phone.length - 4, 4);
       sendSMSService.sendBuyLink(
-        order.publish.activity.code,
         order.publish.activity.name,
         order.publish.activity.finalPrice,
-        order.publish.activity.pay_end_at,
+        payEndAt.format("MM/DD"),
+        sendEndAt.format("MM/DD"),
+        checkCode,
         `${ORDER_MOBILE_PAGE}/${order.id}`,
-        order.customer.phone
+        phone
       );
     });
   }
-  async sendDiscountSMSToCustomerByActivityId(activityId: number) {
+  async sendDiscountSMSToCustomerByActivityId(
+    activityId: number,
+    discount: Discount
+  ) {
     let orders = await orderRepository.findByActivityId(activityId);
     orders.forEach((order) => {
       sendSMSService.sendDiscountSMS(
-        order.publish.activity.code,
         order.publish.activity.name,
+        discount.peopleCount,
         order.publish.activity.finalPrice,
         order.customer.phone,
         `${ORDER_MOBILE_PAGE}/detail/${order.id}`
@@ -157,14 +173,17 @@ class OrderService {
     order = await orderRepository.save(order);
     customer = await customerRepository.save(customer);
     await publishService.updateCount({ publishId: order.publishId });
+    const checkCode = customer.phone.substr(customer.phone.length - 4, 4);
+    const sendAt = moment(order.publish.activity.pay_end_at * 1000).add(
+      1,
+      "day"
+    );
     sendSMSService.sendAfterBuySMS(
       customer.phone,
-      order.publish.activity.code,
       order.publish.activity.name,
-      order.buyCount,
       order.totalPrice,
-      customer.address,
-      `${ORDER_MOBILE_PAGE}/detail/${order.id}`
+      checkCode,
+      sendAt.format("MM/DD")
     );
     sendEmailService.sendAfterBuyEmail(
       customer.email,

@@ -10,6 +10,7 @@ import activityImageRepository from "../repository/activityImageRepository";
 import activityVideoRepository from "../repository/activityVideoRepository";
 import { OrderStatus } from "../enum/OrderStatus";
 import { transfer } from "../dto/ActivtyDTOForMachine";
+import { Discount } from "../entity/Discount";
 const publishMobilePage =
   process.env.PUBLISH_MOBILE_PAGE || "http://localhost:3000/mobile/publish";
 const discountError = new HttpException(400, "階層設定異常");
@@ -293,22 +294,26 @@ class ActivityService {
     );
     let level = 0;
     let price = act.price;
+    let discount: Discount | null = null;
     if (discounts.length > 0) {
       level = discounts[0].level;
       price = Math.round((discounts[0].percent * price) / 100);
+      discount = discounts[0];
     }
-    return { level, price };
+    return { level, price, discount };
   }
   async updateActivityDiscountLevelAndFinalPrice(activityId: number) {
     let act = await this.getActivity({ activityId });
-    const { level, price } = this.getDiscountLevelAndFinalPrice(act);
-    if (level == act.discountLevel) {
-      return act;
+    const { level, price, discount } = this.getDiscountLevelAndFinalPrice(act);
+    if (level != act.discountLevel && discount) {
+      act.discountLevel = level;
+      act.finalPrice = price;
+      act = await activityRepository.save(act);
+      await orderService.sendDiscountSMSToCustomerByActivityId(
+        act.id,
+        discount
+      );
     }
-    act.discountLevel = level;
-    act.finalPrice = price;
-    act = await activityRepository.save(act);
-    await orderService.sendDiscountSMSToCustomerByActivityId(act.id);
     return act;
   }
   async updateFinalPrice({ activityId, activity, updateNow }: activityProps) {
@@ -334,6 +339,9 @@ class ActivityService {
   }: activityProps) {
     let act = await this.getActivity({ activityId, activity });
     act.status = ActivityStatus.END;
+    if (updateNow) {
+      await activityRepository.save(act);
+    }
     // act = await this.updateFinalPrice({ activity: act, updateNow });
     orderService.sendSMSToCustomerByActivityId(act.id);
     // orderService.sendMailToCutomerByActivityId(act.id);
