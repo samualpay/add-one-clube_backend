@@ -6,8 +6,8 @@ import moment from "moment";
 class SendEmailService {
   send(phone: string, content: string) {
     const data = qs.stringify({
-      username: "85129581",
-      password: "addoneclub",
+      username: process.env.SMS_USERNAME,
+      password: process.env.SMS_PASSWORD,
       dstaddr: phone,
       smbody: content,
     });
